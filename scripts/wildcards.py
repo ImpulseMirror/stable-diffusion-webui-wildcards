@@ -1,7 +1,7 @@
 import os
 import random
 import sys
-
+import shutil
 from modules import scripts, script_callbacks, shared
 from modules.script_callbacks import ImageSaveParams
 
@@ -39,10 +39,6 @@ class WildcardsScript(scripts.Script):
         # check if all wildcard sort settings are enabled
         return shared.opts.enable_wildcard_sort and shared.opts.wildcard_key
 
-    def generate_wildcard_prompt_no_sort(self, prompt, gen):
-        # default functionality
-        return "".join(self.replace_wildcard(chunk, gen) for chunk in prompt.split("__"))
-
     def get_wildcard_sort_name(self, prompt, gen):
         # gets the value of the wildcard being sorted by
         # will only attempt to find the first instance of said wildcard
@@ -66,14 +62,15 @@ class WildcardsScript(scripts.Script):
         return wildcard_val
 
     def process(self, p):
+        global wildcard_sort_name
+        wildcard_sort_name = ""
         original_prompt = p.all_prompts[0]
         for i in range(len(p.all_prompts)):
             gen = random.Random()
             gen.seed(p.all_seeds[0 if shared.opts.wildcards_same_seed else i])
 
             prompt = p.all_prompts[i]
-            prompt = self.get_wildcard_sort_name(prompt, gen) if self.wildcard_sort_enabled(
-            ) else self.wildcard_sort_enabled(prompt, gen)
+            prompt = self.get_wildcard_sort_name(prompt, gen)
 
             p.all_prompts[i] = prompt
 
@@ -90,14 +87,15 @@ def create_if_not_exist(dirs: list):
             os.makedirs(dir)
 
 
-def on_before_image_saved(params: ImageSaveParams):
+def on_image_saved(params: ImageSaveParams):
     # callback sets image path to the new directory if sort is enabled
     if shared.opts.enable_wildcard_sort and wildcard_sort_name and shared.opts.wildcard_key:
         base_name = os.path.basename(params.filename)
         new_dir = params.filename.replace(
             base_name, f"/sorted/{shared.opts.wildcard_key}s/{wildcard_sort_name}")
         create_if_not_exist([new_dir])
-        params.filename = os.path.realpath(f"{new_dir}/{base_name}")
+        shutil.copy(params.filename, os.path.realpath(
+            f"{new_dir}/{base_name}"))
     return params
 
 
@@ -111,4 +109,4 @@ def on_ui_settings():
 
 
 script_callbacks.on_ui_settings(on_ui_settings)
-script_callbacks.on_before_image_saved(on_before_image_saved)
+script_callbacks.on_image_saved(on_image_saved)
