@@ -55,7 +55,7 @@ class WildcardsScript(scripts.Script):
             if shared.opts.wildcard_key == chunk and is_wildcard:
                 wildcard_val = self.clean_wildcard(replace_val)
                 wildcard_sort_name = wildcard_val if not wildcard_sort_name else f"{wildcard_sort_name} and {wildcard_val}"
-        wildcard_sort_name = wildcard_sort_name[:255]
+        wildcard_sort_name = wildcard_sort_name[:50]
         return new_prompt
 
     def clean_wildcard(self, wildcard_val):
