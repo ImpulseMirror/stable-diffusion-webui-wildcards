@@ -33,7 +33,7 @@ class WildcardsScript(scripts.Script):
                     f"File {replacement_file} not found for the __{text}__ wildcard.", file=sys.stderr)
                 warned_about_files[replacement_file] = 1
 
-        return text
+        return text, False
 
     def wildcard_sort_enabled(self):
         # check if all wildcard sort settings are enabled
