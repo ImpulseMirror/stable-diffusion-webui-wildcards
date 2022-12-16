@@ -5,5 +5,7 @@ Allows you to use `__name__` syntax in your prompt to get a random line from a f
 
 Allows you to sort generated images into folders based on a specified wildcard. 
 
-When enabled, `character` will look for the instances of `__character__` in a prompt and save images into the directory `/sorted/characters/{charactername}.{extension}`
+When sort is enabled, `character` will look for the instances of `__character__` in a prompt and save images into the directory `/sorted/characters/{default_file_name #}.{extension}`
 Providing an invalid wildcard will save to the default save path.
+
+If rename is enabled, images will not duplicate into a `sorted` folder. Instead they will be renamed `{default_file_name #} character {character name}.{extension}`
